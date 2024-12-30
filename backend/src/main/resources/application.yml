@@ -14,7 +14,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
   profiles:
-    active: dev  # 开发环境使用 dev，生产环境改为 prod
+    active: local  # 开发环境使用 dev，生产环境改为 prod
 
 logging:
   level:

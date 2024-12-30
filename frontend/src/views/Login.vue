@@ -49,8 +49,8 @@ interface FormState {
 }
 
 const formState = reactive<FormState>({
-  username: 'test',
-  password: '123456'
+  username: '',
+  password: ''
 })
 
 const onFinish = async (values: FormState) => {

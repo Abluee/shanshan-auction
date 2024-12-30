@@ -44,6 +44,16 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('user')
   }
 
+  async function logout() {
+    try {
+      await request.post('/auth/logout')
+    } catch (_) {
+      // 错误已在 request.ts 中统一处理
+    } finally {
+      clearUser()
+    }
+  }
+
   // 初始化时从本地存储加载用户信息
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
@@ -60,6 +70,7 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     isAdmin,
     login,
+    logout,
     setUser,
     clearUser
   }

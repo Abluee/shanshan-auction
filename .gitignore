@@ -23,7 +23,7 @@ backend/!.mvn/wrapper/maven-wrapper.jar
 backend/*.log
 backend/logs/
 backend/.env
-backend/application-local.yml
+backend/src/main/resources/application-local.yml
 
 # OS
 .DS_Store
@@ -32,4 +32,4 @@ Thumbs.db
 # Temp files
 *.tmp
 *.temp
-*.bak 
+*.bak
