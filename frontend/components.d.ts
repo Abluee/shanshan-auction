@@ -13,7 +13,6 @@ declare module 'vue' {
     AFormItem: typeof import('ant-design-vue/es')['FormItem']
     AInput: typeof import('ant-design-vue/es')['Input']
     AInputPassword: typeof import('ant-design-vue/es')['InputPassword']
-    BidDrawer: typeof import('./src/components/BidDrawer.vue')['default']
     CountdownTimer: typeof import('./src/components/CountdownTimer.vue')['default']
     CreateAuctionModal: typeof import('./src/components/CreateAuctionModal.vue')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']

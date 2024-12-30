@@ -8,6 +8,6 @@ public interface ItemService {
     List<ItemResponse> listBasic();
     List<ItemResponse> listAll();
     ItemResponse getById(Long id);
-    ItemResponse save(ItemRequest request);  // 统一处理创建和更新
+    ItemResponse save(ItemRequest request,Long userId);  // 统一处理创建和更新
     void remove(Long id);
 } 

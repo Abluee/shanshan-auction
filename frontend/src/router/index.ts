@@ -1,9 +1,9 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useAuctionStore } from '../stores/auction'
 
 const router = createRouter({
-  history: createWebHashHistory('./'),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -16,6 +16,11 @@ const router = createRouter({
     {
       path: '/login',
       component: () => import('../views/Login.vue')
+    },
+    {
+      path: '/admin/items',
+      component: () => import('@/views/admin/ItemManagement.vue'),
+      meta: { requiresAdmin: true }
     }
   ]
 })
@@ -31,7 +36,11 @@ router.beforeEach((to, from, next) => {
       store.clearCurrentItem()
       store.clearRefreshTimer()
     }
-    next()
+    if (to.meta.requiresAdmin && !userStore.isAdmin) {
+      next('/login')
+    } else {
+      next()
+    }
   }
 })
 

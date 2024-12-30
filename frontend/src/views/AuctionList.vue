@@ -58,35 +58,6 @@
       @update:visible="showCreateModal = $event"
       @create="handleCreateAuction"
     />
-
-    <!-- 快速出价抽屉 -->
-    <a-drawer
-      :open="quickBidVisible"
-      placement="bottom"
-      height="300"
-      @close="quickBidVisible = false"
-    >
-      <template #title>
-        <div class="quick-bid-title">
-          <span>快速出价</span>
-          <span class="current-price">当前价: ¥{{ selectedItem?.currentPrice }}</span>
-        </div>
-      </template>
-      <div class="quick-bid-content">
-        <div class="bid-buttons">
-          <a-button
-            v-for="amount in quickBidAmounts"
-            :key="amount"
-            type="primary"
-            ghost
-            size="large"
-            @click="handleQuickBid(amount)"
-          >
-            ¥{{ amount }}
-          </a-button>
-        </div>
-      </div>
-    </a-drawer>
   </div>
 </template>
 
@@ -95,6 +66,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import type { AuctionItem } from '../types/auction'
+import { sortAuctionItems } from '../types/auction'
 import CreateAuctionModal from '../components/CreateAuctionModal.vue'
 import NavBar from '../components/NavBar.vue'
 import { message } from 'ant-design-vue'
@@ -113,10 +85,8 @@ const fetchAuctions = async () => {
   try {
     loading.value = true
     const response = await request.get('/items/list')
-    auctionItems.value = response || []
-  } catch (error) {
-    console.error('Failed to fetch auctions:', error)
-    message.error('获取拍卖列表失败')
+    auctionItems.value = sortAuctionItems(response || [])
+  } catch (_) {
   } finally {
     loading.value = false
   }

@@ -24,16 +24,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  async function logout() {
-    try {
-      await request.post('/auth/logout')
-    } catch (error) {
-      console.error('Logout failed:', error)
-    } finally {
-      clearUser()
-    }
-  }
-
   function setUser(user: any) {
     userId.value = user.userId
     username.value = user.username
@@ -41,7 +31,6 @@ export const useUserStore = defineStore('user', () => {
     avatar.value = user.avatar
     token.value = user.token
     role.value = user.role
-    // 保存到本地存储
     localStorage.setItem('user', JSON.stringify(user))
   }
 
@@ -52,7 +41,6 @@ export const useUserStore = defineStore('user', () => {
     avatar.value = ''
     token.value = ''
     role.value = ''
-    // 清除本地存储
     localStorage.removeItem('user')
   }
 
@@ -72,7 +60,6 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     isAdmin,
     login,
-    logout,
     setUser,
     clearUser
   }

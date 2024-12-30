@@ -26,7 +26,6 @@ request.interceptors.response.use(
     const res = response.data
     if (res.code !== 200) {
       message.error(res.message || '请求失败')
-      // 处理未登录或登录过期
       if (res.code === 401) {
         const userStore = useUserStore()
         userStore.clearUser()

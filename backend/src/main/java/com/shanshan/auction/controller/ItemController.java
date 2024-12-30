@@ -5,6 +5,7 @@ import com.shanshan.auction.dto.ItemResponse;
 import com.shanshan.auction.service.ItemService;
 import com.shanshan.auction.common.Result;
 import com.shanshan.auction.annotation.RequireAdmin;
+import com.shanshan.auction.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    private final JwtUtil jwtUtils;
 
     @GetMapping("/list")
     public Result<List<ItemResponse>> list() {
@@ -32,17 +34,10 @@ public class ItemController {
 
     @PostMapping("/save")
     @RequireAdmin
-    public Result<ItemResponse> save(@RequestBody @Valid ItemRequest request) {
-        return Result.success(itemService.save(request));
+    public Result<ItemResponse> save(@RequestBody @Valid ItemRequest request,@RequestHeader("Authorization") String token) {
+        Long userId = jwtUtils.getUserIdFromToken(token.replace("Bearer ", ""));
+        return Result.success(itemService.save(request,userId));
     }
-
-//    @PostMapping("/update")
-//    @RequireAdmin
-//    public Result<ItemResponse> update(
-//            @RequestParam @NotNull(message = "商品ID不能为空") Long id,
-//            @RequestBody @Valid ItemRequest request) {
-//        return Result.success(itemService.update(id, request));
-//    }
 
     @PostMapping("/remove")
     @RequireAdmin

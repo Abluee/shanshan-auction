@@ -32,13 +32,16 @@ public class ItemRequest {
     private LocalDateTime endTime;
 
     @NotNull(message = "延时时长不能为空")
-    @Min(value = 1, message = "延时时长必须大于0")
-    @Max(value = 30, message = "延时时长不能超过30分钟")
+    @Min(value = 30, message = "延时时长必须大于30秒")
+    @Max(value = 3600, message = "延时时长不能超过3600秒")
     private Integer delayDuration;
 
     @NotEmpty(message = "商品图片不能为空")
-    @Size(max = 9, message = "最多上传9张图片")
-    private List<String> imageUrls;
+    @Size(min = 1, max = 9, message = "图片数量必须在1-9张之间")
+    private List<@Pattern(
+        regexp = "^(http|https)://.*$",
+        message = "图片URL必须以http://或https://开头"
+    ) String> imageUrls;
 
     @AssertTrue(message = "结束时间必须晚于开始时间")
     private boolean isEndTimeValid() {
@@ -47,4 +50,4 @@ public class ItemRequest {
         }
         return endTime.isAfter(startTime);
     }
-} 
+}

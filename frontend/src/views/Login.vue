@@ -59,8 +59,7 @@ const onFinish = async (values: FormState) => {
     await userStore.login(values.username, values.password)
     message.success('登录成功')
     router.push('/')
-  } catch (error: any) {
-    message.error(error.message || '登录失败')
+  } catch (_) {
   } finally {
     loading.value = false
   }

@@ -2,7 +2,6 @@ package com.shanshan.auction.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.shanshan.auction.dto.BidHistoryResponse;
-import com.shanshan.auction.dto.CreateItemRequest;
 import com.shanshan.auction.dto.ItemRequest;
 import com.shanshan.auction.dto.ItemResponse;
 import com.shanshan.auction.exception.BusinessException;
@@ -19,13 +18,10 @@ import com.shanshan.auction.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -160,7 +156,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemResponse save(ItemRequest request) {
+    public ItemResponse save(ItemRequest request,Long userId) {
         // 1. 创建商品
         Item item = new Item();
         item.setTitle(request.getTitle());
@@ -172,14 +168,14 @@ public class ItemServiceImpl implements ItemService {
         item.setEndTime(request.getEndTime());
         item.setDelayDuration(request.getDelayDuration());
         item.setStatus(ItemStatus.NOT_STARTED);
-        item.setCreatedBy(getCurrentUserId());
+        item.setCreatedBy(userId);
         item.setCreatedAt(LocalDateTime.now());
         item.setUpdatedAt(LocalDateTime.now());
 
         itemMapper.insert(item);
 
         // 2. 初始化版本号
-        itemMapper.initVersion(item.getId());
+        itemMapper.initVersion(item.getId(),request.getStartPrice());
 
         // 3. 保存商品图片
         if (request.getImageUrls() != null && !request.getImageUrls().isEmpty()) {
@@ -259,20 +255,6 @@ public class ItemServiceImpl implements ItemService {
         itemMapper.deleteById(id);
     }
 
-    private Long getCurrentUserId() {
-        // 从请求上下文中获取当前用户ID
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null) {
-            throw new BusinessException("无法获取当前用户信息");
-        }
-        
-        Long userId = (Long) attributes.getRequest().getAttribute("userId");
-        if (userId == null) {
-            throw new BusinessException("用户未登录");
-        }
-        
-        return userId;
-    }
 
     @Override
     public List<ItemResponse> listBasic() {
@@ -304,38 +286,5 @@ public class ItemServiceImpl implements ItemService {
                     return ItemResponse.fromItemBasic(item, images);
                 })
                 .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public Item createItem(CreateItemRequest request) {
-        // ... 创建商品的其他逻辑 ...
-
-        // 保存商品信息
-        Item item = convertToItem(request);
-        itemMapper.insert(item);
-
-        // 初始化版本号
-        itemMapper.initVersion(item.getId());
-
-        // ... 保存图片等其他逻辑 ...
-
-        return item;
-    }
-
-    private Item convertToItem(CreateItemRequest request) {
-        Item item = new Item();
-        item.setTitle(request.getTitle());
-        item.setDescription(request.getDescription());
-        item.setStartPrice(request.getStartPrice());
-        item.setCurrentPrice(request.getStartPrice()); // 初始当前价格等于起拍价
-        item.setIncrementAmount(request.getIncrementAmount());
-        item.setStartTime(request.getStartTime());
-        item.setEndTime(request.getEndTime());
-        item.setDelayDuration(request.getDelayDuration());
-        item.setStatus(calculateItemStatus(item)); // 根据时间计算状态
-        item.setCreatedBy(getCurrentUserId());
-        item.setCreatedAt(LocalDateTime.now());
-        item.setUpdatedAt(LocalDateTime.now());
-        return item;
     }
 } 

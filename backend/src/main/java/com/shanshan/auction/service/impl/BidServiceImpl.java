@@ -51,7 +51,7 @@ public class BidServiceImpl implements BidService {
         // 4. 获取或初始化版本号
         Long version = itemMapper.getVersion(itemId);
         if (version == null) {
-            itemMapper.initVersion(itemId);
+            itemMapper.initVersion(itemId,item.getCurrentPrice());
             version = 1L;
         }
 
@@ -66,7 +66,20 @@ public class BidServiceImpl implements BidService {
                 if (versionUpdated > 0) {
                     // 创建出价记录
                     createBidRecord(itemId, userId, price);
-                    return itemMapper.selectById(itemId);
+                    
+                    // 检查是否需要延长结束时间
+                    LocalDateTime now = LocalDateTime.now();
+                    if (item.getEndTime() != null && item.getDelayDuration() != null) {
+                        long remainingSeconds = java.time.Duration.between(now, item.getEndTime()).getSeconds();
+                        if (remainingSeconds < item.getDelayDuration()) {
+                            // 延长结束时间
+                            LocalDateTime newEndTime = now.plusSeconds(item.getDelayDuration());
+                            itemMapper.updateEndTime(itemId, newEndTime);
+                            item = itemMapper.selectById(itemId);
+                        }
+                    }
+                    
+                    return item;
                 }
             }
             

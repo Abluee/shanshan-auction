@@ -16,10 +16,7 @@
           <template #overlay>
             <a-menu>
               <a-menu-item v-if="userStore.isAdmin" key="admin">
-                <router-link to="/admin">管理后台</router-link>
-              </a-menu-item>
-              <a-menu-item key="profile">
-                <router-link to="/profile">个人中心</router-link>
+                <router-link to="/admin/items">商品管理</router-link>
               </a-menu-item>
               <a-menu-item key="logout" @click="handleLogout">
                 退出登录

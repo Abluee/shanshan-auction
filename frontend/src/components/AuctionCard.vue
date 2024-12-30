@@ -49,10 +49,10 @@
           <span>{{ bidHistory.length }}次出价</span>
           <span class="bidders">
             <a-avatar-group :max-count="3" size="small">
-              <a-avatar 
-                v-for="bid in bidHistory.slice(0,3)" 
-                :key="bid.id" 
-                :src="bid.userAvatar || getMockAvatar(bid.userId)" 
+              <a-avatar
+                v-for="bid in bidHistory.slice(0,3)"
+                :key="bid.id"
+                :src="bid.userAvatar || getMockAvatar(bid.userId)"
               />
             </a-avatar-group>
           </span>
@@ -61,7 +61,6 @@
           type="primary"
           shape="round"
           v-if="item.status === AuctionStatus.ONGOING"
-          @click.stop="$emit('bid', item)"
         >
           出价
         </a-button>

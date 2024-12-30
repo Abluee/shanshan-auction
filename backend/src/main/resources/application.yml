@@ -11,6 +11,8 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
   profiles:
     active: dev  # 开发环境使用 dev，生产环境改为 prod
 

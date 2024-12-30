@@ -52,7 +52,8 @@
           v-model:value="customBidAmount"
           :min="currentItem.currentPrice + currentItem.incrementAmount"
           :step="currentItem.incrementAmount"
-          style="width: 200px"
+          :placeholder="`请输入大于${currentItem.currentPrice + currentItem.incrementAmount}元的任意金额`"
+          style="width: 100%"
         />
         <a-button type="primary" @click="handleBid(customBidAmount)">
           确认出价
@@ -107,9 +108,8 @@ const fetchItemDetail = async (id: string) => {
     loading.value = true
     const response = await request.get(`/items/${id}`)
     currentItem.value = response
-  } catch (error) {
-    console.error('Failed to fetch item:', error)
-    message.error('获取商品详情失败')
+  } catch (_) {
+    // message.error('获取商品详情失败')
   } finally {
     loading.value = false
   }
@@ -148,8 +148,10 @@ const handleBid = async (amount: number) => {
     // 刷新数据
     await fetchItemDetail(currentItem.value.id)
     await fetchBidHistory(currentItem.value.id)
-  } catch (error: any) {
-    message.error(error.message || '出价失败')
+  } catch (_) {
+    // message.error('出价失败')
+  } finally {
+    currentItem?.value?.id && fetchItemDetail(currentItem.value.id)
   }
 }
 

@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Delete;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -26,8 +27,8 @@ public interface ItemMapper extends BaseMapper<Item> {
     @Update("UPDATE item_version SET version = version + 1 WHERE item_id = #{itemId} AND version = #{version}")
     int updateVersion(@Param("itemId") Long itemId, @Param("version") Long version);
 
-    @Insert("INSERT INTO item_version(item_id, version) VALUES(#{itemId}, 1)")
-    int initVersion(@Param("itemId") Long itemId);
+    @Insert("INSERT INTO item_version(item_id, version,current_price) VALUES(#{itemId}, 1,#{currentPrice})")
+    int initVersion(@Param("itemId") Long itemId,@Param("currentPrice") BigDecimal currentPrice);
 
     @Select("SELECT * FROM bid WHERE item_id IN " +
             "<foreach collection='itemIds' item='id' open='(' separator=',' close=')'>" +
@@ -38,4 +39,7 @@ public interface ItemMapper extends BaseMapper<Item> {
 
     @Delete("DELETE FROM item_version WHERE item_id = #{itemId}")
     int deleteVersion(@Param("itemId") Long itemId);
+
+    @Update("UPDATE item SET end_time = #{endTime} WHERE id = #{itemId}")
+    int updateEndTime(@Param("itemId") Long itemId, @Param("endTime") LocalDateTime endTime);
 } 
