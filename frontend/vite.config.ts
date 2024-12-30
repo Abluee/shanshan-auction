@@ -12,7 +12,16 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8010',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: false,
+        ws: true
+      }
+    }
   },
   build: {
     outDir: 'dist',
@@ -25,4 +34,4 @@ export default defineConfig({
       }
     }
   }
-}) 
+})

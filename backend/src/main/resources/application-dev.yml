@@ -7,4 +7,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true 
+    show-sql: true
+
+mybatis-plus:
+  configuration:
+    # 使用自定义日志实现
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
+
+logging:
+  level:
+    root: WARN
+    com.shanshan.auction: INFO
+    # 只打印 SQL 语句
+    com.shanshan.auction.mapper: DEBUG
+  pattern:
+    # 自定义日志格式，只显示 SQL 和参数
+    console: "%msg%n" 

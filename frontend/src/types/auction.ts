@@ -1,15 +1,15 @@
 export interface AuctionItem {
   id: string;
   title: string;
+  description?: string;
   images: string[];
   startPrice: number;
   currentPrice: number;
   startTime: string;
   endTime: string;
   incrementAmount: number;
-  delayDuration: number; // 延时时长(分钟)
-  status: 'notStarted' | 'ongoing' | 'ended';
-  lastBidUser?: User;
+  delayDuration: number;
+  status: 'NOT_STARTED' | 'ONGOING' | 'ENDED';
   bidHistory: Bid[];
 }
 
@@ -24,4 +24,6 @@ export interface Bid {
   userId: string;
   price: number;
   time: string;
-} 
+  username: string;
+  userAvatar: string;
+}

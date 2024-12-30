@@ -5,16 +5,16 @@
       <div class="tabs">
         <a-tabs v-model:activeKey="activeTab">
           <a-tab-pane key="selected" tab="精选"></a-tab-pane>
-          <a-tab-pane key="myBids" tab="我参拍的">
-            <template #tab>
-              <span>我参拍的</span>
-              <a-badge 
-                :count="myBidsCount" 
-                :number-style="{ backgroundColor: '#ff4d4f' }"
-                style="margin-left: 8px"
-              />
-            </template>
-          </a-tab-pane>
+<!--          <a-tab-pane key="myBids" tab="我参拍的">-->
+<!--            <template #tab>-->
+<!--              <span>我参拍的</span>-->
+<!--              <a-badge-->
+<!--                :count="myBidsCount"-->
+<!--                :number-style="{ backgroundColor: '#ff4d4f' }"-->
+<!--                style="margin-left: 8px"-->
+<!--              />-->
+<!--            </template>-->
+<!--          </a-tab-pane>-->
         </a-tabs>
       </div>
     </div>
@@ -24,37 +24,52 @@
         <div v-for="item in auctionItems" :key="item.id" class="auction-item" @click="goToDetail(item.id)">
           <div class="item-image">
             <img :src="item.images[0]" :alt="item.title" />
-            <div class="countdown" v-if="item.status !== 'ended'">
-              <countdown-timer 
-                :end-time="item.endTime" 
-                :start-time="item.startTime"
-                :status="item.status"
-              />
-            </div>
-            <div class="status-badge" :class="item.status">
-              <template v-if="item.status === 'ended'">
-                <div class="winner">
+            <div class="item-overlay" :class="getAuctionStatus(item)">
+              <div class="status-badge" :class="getAuctionStatus(item)">
+                <template v-if="getAuctionStatus(item) === 'ended'">
                   <span>已结束</span>
-                  <div v-if="item.bidHistory.length" class="winner-info">
-                    <a-avatar :src="getMockAvatar(item.bidHistory[0].userId)" size="small" />
-                    <span>获胜者: 用户{{ item.bidHistory[0].userId.slice(-1) }}</span>
+                </template>
+                <template v-else-if="getAuctionStatus(item) === 'notstarted'">
+                  <span>未开始</span>
+                </template>
+                <template v-else>
+                  <span>进行中</span>
+                </template>
+              </div>
+
+              <div v-if="getAuctionStatus(item) === 'ended'" class="winner-info">
+                <template v-if="item.bidHistory.length">
+                  <div class="winner-avatar">
+                    <a-avatar :src="getMockAvatar(item.bidHistory[0].userId)" />
                   </div>
+                  <div class="winner-detail">
+                    <div class="winner-label">获胜者</div>
+                    <div class="winner-name">用户{{ item.bidHistory[0].userId.slice(-1) }}</div>
+                  </div>
+                </template>
+                <div v-else class="no-winner">
+                  <span>流拍</span>
                 </div>
-              </template>
-              <template v-else-if="item.status === 'notStarted'">
-                <span>未开始</span>
-              </template>
+              </div>
+
+              <div class="countdown" v-else>
+                <countdown-timer
+                  :end-time="item.endTime"
+                  :start-time="item.startTime"
+                  :status="item.status"
+                />
+              </div>
             </div>
           </div>
           <div class="item-info">
             <div class="item-title">{{ item.title }}</div>
-            <div class="item-tags">
-              <a-tag color="orange">假货包赔</a-tag>
-              <a-tag color="green">48小时发货</a-tag>
-            </div>
+<!--            <div class="item-tags">-->
+<!--              <a-tag color="orange">假货包赔</a-tag>-->
+<!--              <a-tag color="green">48小时发货</a-tag>-->
+<!--            </div>-->
             <div class="item-price">
               <span class="current-price">¥{{ item.currentPrice }}</span>
-              <span class="original-price">¥{{ item.startPrice * 3 }}</span>
+<!--              <span class="original-price">¥{{ item.startPrice * 3 }}</span>-->
             </div>
             <div class="item-footer">
               <div class="bid-info">
@@ -65,15 +80,15 @@
                   </a-avatar-group>
                 </span>
               </div>
-              <a-button 
-                type="primary" 
+              <a-button
+                type="primary"
                 shape="round"
-                v-if="item.status === 'ongoing'"
+                v-if="getAuctionStatus(item) === 'ongoing'"
                 @click.stop="showQuickBid(item)"
               >
                 出价
               </a-button>
-              <span v-else-if="item.status === 'ended'" class="ended-text">已结束</span>
+              <span v-else-if="getAuctionStatus(item) === 'ended'" class="ended-text">已结束</span>
               <span v-else class="not-started-text">未开始</span>
             </div>
           </div>
@@ -81,7 +96,7 @@
       </template>
       <template v-else>
         <div class="empty-state">
-          <a-empty 
+          <a-empty
             :description="activeTab === 'myBids' ? '您还没有参与任何拍卖' : '暂无拍卖商品'"
           >
             <template #extra>
@@ -94,8 +109,8 @@
       </template>
     </div>
 
-    <a-float-button 
-      type="primary" 
+    <a-float-button
+      type="primary"
       @click="showCreateModal = true"
       style="position: fixed; right: 24px; bottom: 24px;"
     >
@@ -104,7 +119,7 @@
       </template>
     </a-float-button>
 
-    <create-auction-modal 
+    <create-auction-modal
       :visible="showCreateModal"
       @update:visible="showCreateModal = $event"
       @create="handleCreateAuction"
@@ -125,8 +140,8 @@
       </template>
       <div class="quick-bid-content">
         <div class="bid-buttons">
-          <a-button 
-            v-for="amount in quickBidAmounts" 
+          <a-button
+            v-for="amount in quickBidAmounts"
             :key="amount"
             type="primary"
             ghost
@@ -142,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import {ref, computed, onMounted, onUnmounted} from 'vue'
 import { useRouter } from 'vue-router'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import type { AuctionItem } from '../types/auction'
@@ -150,7 +165,7 @@ import CountdownTimer from '../components/CountdownTimer.vue'
 import CreateAuctionModal from '../components/CreateAuctionModal.vue'
 import NavBar from '../components/NavBar.vue'
 import { useAuctionStore } from '../stores/auction'
-import dayjs from 'dayjs'
+import {message} from "ant-design-vue";
 
 const router = useRouter()
 const store = useAuctionStore()
@@ -162,7 +177,7 @@ const currentUserId = 'user1'
 
 const auctionItems = computed(() => {
   if (activeTab.value === 'myBids') {
-    return store.auctionItems.filter(item => 
+    return store.auctionItems.filter(item =>
       item.bidHistory.some(bid => bid.userId === currentUserId)
     )
   }
@@ -199,32 +214,40 @@ const showQuickBid = (item: AuctionItem) => {
   quickBidVisible.value = true
 }
 
-const handleQuickBid = (amount: number) => {
+const handleQuickBid = async (amount: number) => {
   if (!selectedItem.value) return
-  
-  const bid = {
-    id: Date.now().toString(),
-    userId: 'user1',
-    price: amount,
-    time: dayjs().format('YYYY-MM-DD HH:mm:ss')
+
+  try {
+    await store.placeBid(selectedItem.value.id, amount)
+    quickBidVisible.value = false
+  } catch (error: any) {
+    message.error(error.message || '出价失败')
   }
-  
-  store.placeBid(selectedItem.value.id, bid)
-  
-  quickBidVisible.value = false
 }
 
-const myBidsCount = computed(() => 
-  store.auctionItems.filter(item => 
+const myBidsCount = computed(() =>
+  store.auctionItems.filter(item =>
     item.bidHistory.some(bid => bid.userId === currentUserId)
   ).length
 )
 
-onMounted(() => {
-  // 定期更新所有商品状态
-  setInterval(() => {
-    store.updateAllAuctionStatus()
-  }, 1000)
+const getAuctionStatus = (item: AuctionItem) => {
+  return item.status.toLowerCase()
+}
+const timer = null;
+
+onMounted(async () => {
+  await store.fetchAuctions()
+  // 定期刷新数据
+  // !timer && setInterval(() => {
+  //   store.fetchAuctions()
+  // }, 1000)  // 每5秒刷新一次
+})
+
+onUnmounted(()=>{
+  if (timer) {
+    clearInterval(timer)
+  }
 })
 </script>
 
@@ -286,15 +309,144 @@ onMounted(() => {
   object-fit: cover;
 }
 
-.countdown {
+.item-overlay {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  background: rgba(0,0,0,0.6);
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+
+  &.ended {
+    background: linear-gradient(
+      180deg,
+      rgba(245, 34, 45, 0.2) 0%,
+      rgba(245, 34, 45, 0.4) 100%
+    );
+    border: 1px solid rgba(245, 34, 45, 0.1);
+  }
+
+  &.notstarted {
+    background: linear-gradient(
+      180deg,
+      rgba(24, 144, 255, 0.2) 0%,
+      rgba(24, 144, 255, 0.4) 100%
+    );
+    border: 1px solid rgba(24, 144, 255, 0.1);
+  }
+
+  &.ongoing {
+    background: linear-gradient(
+      180deg,
+      rgba(82, 196, 26, 0.2) 0%,
+      rgba(82, 196, 26, 0.4) 100%
+    );
+    border: 1px solid rgba(82, 196, 26, 0.1);
+  }
+}
+
+.auction-item:hover .item-overlay {
+  &.ended {
+    background: linear-gradient(
+      180deg,
+      rgba(245, 34, 45, 0.3) 0%,
+      rgba(245, 34, 45, 0.5) 100%
+    );
+  }
+
+  &.notstarted {
+    background: linear-gradient(
+      180deg,
+      rgba(24, 144, 255, 0.3) 0%,
+      rgba(24, 144, 255, 0.5) 100%
+    );
+  }
+
+  &.ongoing {
+    background: linear-gradient(
+      180deg,
+      rgba(82, 196, 26, 0.3) 0%,
+      rgba(82, 196, 26, 0.5) 100%
+    );
+  }
+}
+
+.status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 4px;
   color: #fff;
-  padding: 8px;
+  font-weight: bold;
+  font-size: 12px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  &.ended {
+    background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+    border: 1px solid rgba(255, 77, 79, 0.3);
+  }
+
+  &.notstarted {
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    border: 1px solid rgba(24, 144, 255, 0.3);
+  }
+
+  &.ongoing {
+    background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+    border: 1px solid rgba(82, 196, 26, 0.3);
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.winner-info {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(4px);
+}
+
+.winner-detail {
+  color: #fff;
+}
+
+.winner-label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.winner-name {
+  font-weight: bold;
+}
+
+.no-winner {
+  color: #fff;
+  font-weight: bold;
   text-align: center;
+  width: 100%;
+}
+
+.countdown {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 12px;
+  color: #fff;
+  text-align: center;
+  backdrop-filter: blur(4px);
 }
 
 .item-info {
@@ -359,39 +511,10 @@ onMounted(() => {
   padding: 16px;
 }
 
-.status-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 8px 16px;
-  color: #fff;
-  font-weight: bold;
-  
-  &.ended {
-    background: rgba(245, 34, 45, 0.8);
-  }
-  
-  &.notStarted {
-    background: rgba(24, 144, 255, 0.8);
-  }
-}
-
-.winner {
-  text-align: center;
-  
-  .winner-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    font-size: 12px;
-  }
-}
-
 .empty-state {
   background: #fff;
   padding: 48px;
   border-radius: 8px;
   text-align: center;
 }
-</style> 
+</style>

@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
-  history: createWebHashHistory('/'),
+  history: createWebHashHistory('./'),
   routes: [
     {
       path: '/',
@@ -10,8 +11,22 @@ const router = createRouter({
     {
       path: '/auction/:id',
       component: () => import('../views/AuctionDetail.vue')
+    },
+    {
+      path: '/login',
+      component: () => import('../views/Login.vue')
     }
   ]
 })
 
-export default router 
+router.beforeEach((to, _from, next) => {
+  const userStore = useUserStore()
+
+  if (!userStore.isLoggedIn && to.path !== '/login') {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
+export default router

@@ -1,3 +1,36 @@
+server:
+  port: 8010
+
 spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/auction?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   profiles:
-    active: local 
+    active: dev  # 开发环境使用 dev，生产环境改为 prod
+
+logging:
+  level:
+    com.shanshan.auction: INFO
+    org.springframework: WARN
+    org.mybatis: WARN
+    com.baomidou.mybatisplus: WARN
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-enums-package: com.shanshan.auction.model.enums
+
+jwt:
+  secret: your_jwt_secret_key_here_make_it_long_and_secure_at_least_256_bits
+  expiration: 604800000  # 7天过期 (7 * 24 * 60 * 60 * 1000)
+  refresh-expiration: 2592000000  # 30天 (用于刷新token) 
