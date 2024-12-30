@@ -3,6 +3,7 @@ package com.shanshan.auction.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import com.shanshan.auction.model.enums.UserRole;
 
 @Data
 @TableName("user")
@@ -13,7 +14,7 @@ public class User {
     private String password;
     private String nickname;
     private String avatar;
-    private String role;
+    private UserRole role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 } 

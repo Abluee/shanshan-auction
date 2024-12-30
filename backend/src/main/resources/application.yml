@@ -31,6 +31,7 @@ mybatis-plus:
   type-enums-package: com.shanshan.auction.model.enums
 
 jwt:
-  secret: your_jwt_secret_key_here_make_it_long_and_secure_at_least_256_bits
-  expiration: 604800000  # 7天过期 (7 * 24 * 60 * 60 * 1000)
+  # 使用Base64编码的安全密钥，至少32字节（256位）
+  secret: "bG9jYWwtc2VjcmV0LWtleS1mb3ItYXVjdGlvbi1hcHAtc2hhbnNoYW4tZGV2ZWxvcG1lbnQ="
+  expiration: 86400000 # 24小时
   refresh-expiration: 2592000000  # 30天 (用于刷新token) 

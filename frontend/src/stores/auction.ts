@@ -6,10 +6,23 @@ import request from '@/utils/request'
 export const useAuctionStore = defineStore('auction', {
   state: () => ({
     auctionItems: [] as AuctionItem[],
-    loading: false
+    currentItem: null as AuctionItem | null,
+    loading: false,
+    refreshTimer: null as number | null
   }),
 
   actions: {
+    setRefreshTimer(timerId: number) {
+      this.refreshTimer = timerId
+    },
+
+    clearRefreshTimer() {
+      if (this.refreshTimer) {
+        clearInterval(this.refreshTimer)
+        this.refreshTimer = null
+      }
+    },
+
     async fetchAuctions() {
       try {
         const response = await request.get('/items/list')
@@ -88,6 +101,11 @@ export const useAuctionStore = defineStore('auction', {
       } else {
         return AuctionStatus.ONGOING
       }
+    },
+
+    // 在路由切换时清理当前商品
+    clearCurrentItem() {
+      this.currentItem = null
     }
   }
 })

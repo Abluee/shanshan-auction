@@ -2,18 +2,18 @@
   <div class="auction-item" @click="goToDetail(item.id)">
     <div class="item-image">
       <img :src="item.images[0]" :alt="item.title" />
+      <div class="status-badge" :class="item.status.toLowerCase()">
+        <template v-if="item.status === AuctionStatus.ENDED">
+          <span>已结束</span>
+        </template>
+        <template v-else-if="item.status === AuctionStatus.NOT_STARTED">
+          <span>未开始</span>
+        </template>
+        <template v-else>
+          <span>进行中</span>
+        </template>
+      </div>
       <div class="item-overlay" :class="getAuctionStatus(item)">
-        <div class="status-badge" :class="item.status.toLowerCase()">
-          <template v-if="item.status === AuctionStatus.ENDED">
-            <span>已结束</span>
-          </template>
-          <template v-else-if="item.status === AuctionStatus.NOT_STARTED">
-            <span>未开始</span>
-          </template>
-          <template v-else>
-            <span>进行中</span>
-          </template>
-        </div>
 
         <div v-if="item.status === AuctionStatus.ENDED" class="winner-info">
           <template v-if="bidHistory.length">
@@ -49,10 +49,10 @@
           <span>{{ bidHistory.length }}次出价</span>
           <span class="bidders">
             <a-avatar-group :max-count="3" size="small">
-              <a-avatar
-                v-for="bid in bidHistory.slice(0,3)"
-                :key="bid.id"
-                :src="getMockAvatar(bid.userId)"
+              <a-avatar 
+                v-for="bid in bidHistory.slice(0,3)" 
+                :key="bid.id" 
+                :src="bid.userAvatar || getMockAvatar(bid.userId)" 
               />
             </a-avatar-group>
           </span>
@@ -90,6 +90,7 @@ defineEmits<{
 
 const router = useRouter()
 const bidHistory = ref<Bid[]>([])
+const loading = ref(false)
 
 const getMockAvatar = (userId: string) => {
   return `https://picsum.photos/32/32?random=${userId}`
@@ -105,10 +106,13 @@ const goToDetail = (id: string) => {
 
 const fetchBidHistory = async () => {
   try {
+    loading.value = true
     const response = await request.get(`/bids/history/${props.item.id}`)
-    bidHistory.value = response
+    bidHistory.value = response || []
   } catch (error) {
     console.error('Failed to fetch bid history:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -150,7 +154,6 @@ onMounted(() => {
 
 .item-overlay {
   position: absolute;
-  top: 0;
   left: 0;
   right: 0;
   bottom: 0;

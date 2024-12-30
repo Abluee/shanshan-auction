@@ -14,3 +14,7 @@ mybatis-plus:
 logging:
   level:
     com.shanshan.auction: DEBUG
+
+jwt:
+  # 本地开发环境可以使用不同的密钥
+  secret: "bG9jYWwtc2VjcmV0LWtleS1mb3ItYXVjdGlvbi1hcHAtc2hhbnNoYW4tZGV2ZWxvcG1lbnQ="

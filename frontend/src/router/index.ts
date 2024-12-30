@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { useAuctionStore } from '../stores/auction'
 
 const router = createRouter({
   history: createWebHashHistory('./'),
@@ -19,12 +20,17 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
 
   if (!userStore.isLoggedIn && to.path !== '/login') {
     next('/login')
   } else {
+    if (from.name === 'auction-detail' && to.name !== 'auction-detail') {
+      const store = useAuctionStore()
+      store.clearCurrentItem()
+      store.clearRefreshTimer()
+    }
     next()
   }
 })

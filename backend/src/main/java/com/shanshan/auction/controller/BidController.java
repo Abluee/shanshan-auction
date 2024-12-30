@@ -2,34 +2,31 @@ package com.shanshan.auction.controller;
 
 import com.shanshan.auction.common.Result;
 import com.shanshan.auction.dto.BidHistoryResponse;
+import com.shanshan.auction.dto.BidRequest;
 import com.shanshan.auction.model.Item;
 import com.shanshan.auction.service.BidService;
+import com.shanshan.auction.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/bids")
 @RequiredArgsConstructor
 public class BidController {
     private final BidService bidService;
+    private final JwtUtil jwtUtils;
 
     @PostMapping("/place")
     public Result<Item> placeBid(
-            @RequestParam @NotNull(message = "商品ID不能为空") Long itemId,
-            @RequestParam @NotNull(message = "出价金额不能为空") @DecimalMin(value = "0.01", message = "出价金额必须大于0") BigDecimal price) {
-        // 从 SecurityContext 中获取当前用户ID
-        Long userId = getCurrentUserId();
-        return Result.success(bidService.placeBid(itemId, userId, price));
-    }
-
-    private Long getCurrentUserId() {
-        // 临时返回测试用户ID，实际应该从 Security Context 中获取
-        return 1L;
+            @RequestBody BidRequest request,
+            @RequestHeader("Authorization") String token) {
+        Long userId = jwtUtils.getUserIdFromToken(token.replace("Bearer ", ""));
+        return Result.success(bidService.placeBid(request.getItemId(), userId, request.getPrice()));
     }
 
     @GetMapping("/history/{itemId}")

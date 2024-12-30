@@ -31,9 +31,21 @@ public class UserServiceImpl implements UserService {
         response.setUsername(user.getUsername());
         response.setNickname(user.getNickname());
         response.setAvatar(user.getAvatar());
-        response.setRole(user.getRole());
+        response.setRole(user.getRole().getCode());
         response.setToken(jwtUtil.generateToken(user.getId()));
         
         return response;
+    }
+
+    @Override
+    public User getById(Long userId) {
+        if (userId == null) {
+            throw new BusinessException("用户ID不能为空");
+        }
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        return user;
     }
 } 

@@ -91,56 +91,39 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted, onUnmounted} from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import type { AuctionItem } from '../types/auction'
-import CountdownTimer from '../components/CountdownTimer.vue'
 import CreateAuctionModal from '../components/CreateAuctionModal.vue'
 import NavBar from '../components/NavBar.vue'
-import { useAuctionStore } from '../stores/auction'
-import {message} from "ant-design-vue";
+import { message } from 'ant-design-vue'
 import AuctionCard from '../components/AuctionCard.vue'
+import request from '@/utils/request'
 
 const router = useRouter()
-const store = useAuctionStore()
 const showCreateModal = ref(false)
 const activeTab = ref('selected')
 const quickBidVisible = ref(false)
 const selectedItem = ref<AuctionItem | null>(null)
-const currentUserId = 'user1'
+const auctionItems = ref<AuctionItem[]>([])
+const loading = ref(false)
 
-const auctionItems = computed(() => {
-  if (activeTab.value === 'myBids') {
-    return store.auctionItems.filter(item =>
-      item.bidHistory.some(bid => bid.userId === currentUserId)
-    )
+const fetchAuctions = async () => {
+  try {
+    loading.value = true
+    const response = await request.get('/items/list')
+    auctionItems.value = response || []
+  } catch (error) {
+    console.error('Failed to fetch auctions:', error)
+    message.error('获取拍卖列表失败')
+  } finally {
+    loading.value = false
   }
-  return store.auctionItems
-})
-
-const quickBidAmounts = computed(() => {
-  if (!selectedItem.value) return []
-  const current = selectedItem.value.currentPrice
-  const increment = selectedItem.value.incrementAmount
-  return [
-    current + increment,
-    current + increment * 2,
-    current + increment * 5,
-    current + increment * 10
-  ]
-})
-
-const getMockAvatar = (userId: string) => {
-  return `https://picsum.photos/32/32?random=${userId}`
 }
 
-const goToDetail = (id: string) => {
-  router.push(`/auction/${id}`)
-}
-
-const handleCreateAuction = (auction: AuctionItem) => {
-  store.addAuction(auction)
+const handleCreateAuction = async (auction: AuctionItem) => {
+  await fetchAuctions()
   showCreateModal.value = false
 }
 
@@ -149,40 +132,8 @@ const showQuickBid = (item: AuctionItem) => {
   quickBidVisible.value = true
 }
 
-const handleQuickBid = async (amount: number) => {
-  if (!selectedItem.value) return
-
-  try {
-    await store.placeBid(selectedItem.value.id, amount)
-    quickBidVisible.value = false
-  } catch (error: any) {
-    message.error(error.message || '出价失败')
-  }
-}
-
-const myBidsCount = computed(() =>
-  store.auctionItems.filter(item =>
-    item.bidHistory.some(bid => bid.userId === currentUserId)
-  ).length
-)
-
-const getAuctionStatus = (item: AuctionItem) => {
-  return item.status.toLowerCase()
-}
-const timer = null;
-
-onMounted(async () => {
-  await store.fetchAuctions()
-  // 定期刷新数据
-  // !timer && setInterval(() => {
-  //   store.fetchAuctions()
-  // }, 1000)  // 每5秒刷新一次
-})
-
-onUnmounted(()=>{
-  if (timer) {
-    clearInterval(timer)
-  }
+onMounted(() => {
+  fetchAuctions()
 })
 </script>
 

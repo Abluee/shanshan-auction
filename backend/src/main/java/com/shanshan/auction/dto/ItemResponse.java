@@ -28,6 +28,29 @@ public class ItemResponse {
     private List<BidHistoryResponse> bidHistory;
     private LocalDateTime createdAt;
 
+    public static ItemResponse fromItem(Item item, List<ItemImage> images, String createdByName, List<BidHistoryResponse> bidHistory) {
+        ItemResponse response = new ItemResponse();
+        response.setId(item.getId());
+        response.setTitle(item.getTitle());
+        response.setDescription(item.getDescription());
+        response.setStartPrice(item.getStartPrice());
+        response.setCurrentPrice(item.getCurrentPrice());
+        response.setIncrementAmount(item.getIncrementAmount());
+        response.setStartTime(item.getStartTime());
+        response.setEndTime(item.getEndTime());
+        response.setDelayDuration(item.getDelayDuration());
+        response.setStatus(item.getStatus());
+        response.setCreatedBy(item.getCreatedBy());
+        response.setCreatedByName(createdByName);
+        response.setCreatedAt(item.getCreatedAt());
+        response.setImages(images.stream()
+                .sorted((a, b) -> a.getSort().compareTo(b.getSort()))
+                .map(ItemImage::getUrl)
+                .collect(Collectors.toList()));
+        response.setBidHistory(bidHistory);
+        return response;
+    }
+
     public static ItemResponse fromItemBasic(Item item, List<ItemImage> images) {
         ItemResponse response = new ItemResponse();
         response.setId(item.getId());

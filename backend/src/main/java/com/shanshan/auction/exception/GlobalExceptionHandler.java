@@ -1,6 +1,7 @@
 package com.shanshan.auction.exception;
 
 import com.shanshan.auction.common.Result;
+import com.shanshan.auction.common.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -18,10 +19,14 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public Result<Void> handleUnauthorizedException(UnauthorizedException e) {
+        return Result.fail(ResultCode.UNAUTHORIZED.getCode(), e.getMessage());
+    }
+
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.warn("业务异常: {}", e.getMessage());
-        return Result.error(e.getMessage());
+        return Result.fail(ResultCode.BUSINESS_ERROR.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -31,7 +36,7 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
         log.warn("参数校验失败: {}", message);
-        return Result.error(message);
+        return Result.fail(message);
     }
 
     @ExceptionHandler(BindException.class)
@@ -41,7 +46,7 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
         log.warn("参数绑定失败: {}", message);
-        return Result.error(message);
+        return Result.fail(message);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -51,12 +56,12 @@ public class GlobalExceptionHandler {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));
         log.warn("参数校验失败: {}", message);
-        return Result.error(message);
+        return Result.fail(message);
     }
 
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception e) {
-        log.error("系统异常", e);
-        return Result.error("系统错误，请稍后重试");
+        log.error("System error", e);
+        return Result.fail(ResultCode.SYSTEM_ERROR.getCode(), "系统错误");
     }
 } 

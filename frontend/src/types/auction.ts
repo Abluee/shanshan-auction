@@ -31,8 +31,8 @@ export interface User {
 export interface Bid {
   id: string;
   userId: string;
-  price: number;
-  time: string;
   username: string;
-  userAvatar: string;
+  userAvatar: string | null;
+  price: number;
+  createdAt: string;
 }
