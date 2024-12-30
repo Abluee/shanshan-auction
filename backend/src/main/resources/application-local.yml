@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mysql://1.117.250.190:3306/auction?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: auction
+    password: Asw970616.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 设置日志级别为 DEBUG 以查看 SQL
+    log-level: DEBUG
+
+logging:
+  level:
+    com.shanshan.auction: DEBUG

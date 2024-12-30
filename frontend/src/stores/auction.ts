@@ -1,11 +1,12 @@
 import {defineStore} from 'pinia'
 import type {AuctionItem} from '../types/auction'
+import { AuctionStatus } from '../types/auction'
 import request from '@/utils/request'
 
 export const useAuctionStore = defineStore('auction', {
   state: () => ({
     auctionItems: [] as AuctionItem[],
-    currentItem: null as AuctionItem | null
+    loading: false
   }),
 
   actions: {
@@ -63,7 +64,7 @@ export const useAuctionStore = defineStore('auction', {
         endTime: item.endTime,
         incrementAmount: item.incrementAmount,
         delayDuration: item.delayDuration,
-        status: item.status.toLowerCase(),
+        status: item.status,
         bidHistory: item.bidHistory.map((bid: any) => ({
           id: bid.id.toString(),
           userId: bid.userId.toString(),
@@ -72,6 +73,20 @@ export const useAuctionStore = defineStore('auction', {
           username: bid.username,
           userAvatar: bid.userAvatar
         }))
+      }
+    },
+
+    calculateStatus(item: AuctionItem): AuctionStatus {
+      const now = new Date()
+      const startTime = new Date(item.startTime)
+      const endTime = new Date(item.endTime)
+
+      if (now < startTime) {
+        return AuctionStatus.NOT_STARTED
+      } else if (now > endTime) {
+        return AuctionStatus.ENDED
+      } else {
+        return AuctionStatus.ONGOING
       }
     }
   }

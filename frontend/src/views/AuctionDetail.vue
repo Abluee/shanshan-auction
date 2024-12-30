@@ -36,7 +36,7 @@
         />
       </div>
 
-      <div class="bid-section" v-if="item.status === 'ongoing'">
+      <div class="bid-section" v-if="item.status === AuctionStatus.ONGOING">
         <div class="quick-bid-buttons">
           <a-button
             v-for="amount in quickBidAmounts"
@@ -85,13 +85,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import {ref, computed, onMounted, onUnmounted} from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import { useAuctionStore } from '../stores/auction'
 import CountdownTimer from '../components/CountdownTimer.vue'
 import NavBar from '../components/NavBar.vue'
+import {AuctionStatus} from "@/types/auction.ts";
 
 const route = useRoute()
 const store = useAuctionStore()
@@ -124,17 +125,23 @@ const formatTime = (time: string) => {
   return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
 }
 
+let timer = null;
+
 onMounted(async () => {
   const id = route.params.id as string
   try {
     await store.fetchItemById(id)
     // 定期刷新数据
-    setInterval(() => {
+    !timer && setInterval(() => {
       store.fetchItemById(id)
     }, 5000)
   } catch (error: any) {
     message.error('获取商品详情失败')
   }
+})
+
+onUnmounted(()=>{
+  timer && clearInterval(timer);
 })
 </script>
 
@@ -222,4 +229,4 @@ onMounted(async () => {
   align-items: center;
   min-height: 400px;
 }
-</style> 
+</style>

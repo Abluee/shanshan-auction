@@ -1,16 +1,25 @@
+export enum AuctionStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  ONGOING = 'ONGOING',
+  ENDED = 'ENDED'
+}
+
 export interface AuctionItem {
   id: string;
   title: string;
-  description?: string;
-  images: string[];
+  description: string;
   startPrice: number;
   currentPrice: number;
+  incrementAmount: number;
   startTime: string;
   endTime: string;
-  incrementAmount: number;
   delayDuration: number;
-  status: 'NOT_STARTED' | 'ONGOING' | 'ENDED';
+  status: AuctionStatus;
+  createdBy: string;
+  createdByName: string;
+  images: string[];
   bidHistory: Bid[];
+  createdAt: string;
 }
 
 export interface User {

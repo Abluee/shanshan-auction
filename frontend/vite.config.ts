@@ -33,5 +33,12 @@ export default defineConfig({
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       }
     }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        javascriptEnabled: true
+      }
+    }
   }
 })
