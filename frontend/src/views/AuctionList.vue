@@ -42,34 +42,15 @@
         </div>
       </template>
     </div>
-
-    <a-float-button
-      type="primary"
-      @click="showCreateModal = true"
-      style="position: fixed; right: 24px; bottom: 24px;"
-    >
-      <template #icon>
-        <plus-outlined />
-      </template>
-    </a-float-button>
-
-    <create-auction-modal
-      :visible="showCreateModal"
-      @update:visible="showCreateModal = $event"
-      @create="handleCreateAuction"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { PlusOutlined } from '@ant-design/icons-vue'
-import type { AuctionItem } from '../types/auction'
-import { sortAuctionItems } from '../types/auction'
-import CreateAuctionModal from '../components/CreateAuctionModal.vue'
+import {onMounted, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import type {AuctionItem} from '../types/auction'
+import {sortAuctionItems} from '../types/auction'
 import NavBar from '../components/NavBar.vue'
-import { message } from 'ant-design-vue'
 import AuctionCard from '../components/AuctionCard.vue'
 import request from '@/utils/request'
 

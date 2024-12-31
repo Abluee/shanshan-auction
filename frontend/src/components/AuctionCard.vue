@@ -175,32 +175,6 @@ onMounted(() => {
   }
 }
 
-.auction-item:hover .item-overlay {
-  &.ended {
-    background: linear-gradient(
-      180deg,
-      rgba(245, 34, 45, 0.3) 0%,
-      rgba(245, 34, 45, 0.5) 100%
-    );
-  }
-
-  &.not_started {
-    background: linear-gradient(
-      180deg,
-      rgba(24, 144, 255, 0.3) 0%,
-      rgba(24, 144, 255, 0.5) 100%
-    );
-  }
-
-  &.ongoing {
-    background: linear-gradient(
-      180deg,
-      rgba(82, 196, 26, 0.3) 0%,
-      rgba(82, 196, 26, 0.5) 100%
-    );
-  }
-}
-
 .status-badge {
   position: absolute;
   top: 12px;
